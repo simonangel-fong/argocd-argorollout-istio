@@ -1,26 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: istio-gateway
+  name: 02-istiod
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "1"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
     repoURL: https://istio-release.storage.googleapis.com/charts
-    chart: gateway
+    chart: istiod
     targetRevision: 1.30.2
     helm:
-      releaseName: istio-gateway
-      values: |
-        service:
-          type: LoadBalancer
+      releaseName: istiod
   destination:
     server: https://kubernetes.default.svc
-    namespace: istio-ingress
+    namespace: istio-system
   syncPolicy:
     automated:
       prune: true
