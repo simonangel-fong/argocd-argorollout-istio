@@ -15,6 +15,10 @@ spec:
     targetRevision: 1.30.2
     helm:
       releaseName: istiod
+      # sidecarInjectorWebhookAnnotations: aks admissions enforcer sync issue
+      values: |
+        sidecarInjectorWebhookAnnotations:
+          admissions.enforcer/disabled: "true"
   destination:
     server: https://kubernetes.default.svc
     namespace: istio-system
@@ -25,7 +29,6 @@ spec:
       jqPathExpressions:
         - .webhooks[].clientConfig.caBundle
         - .webhooks[].failurePolicy
-        - '.webhooks[].namespaceSelector.matchExpressions[] | select(.key == "control-plane" or .key == "kubernetes.azure.com/managedby")'
     - group: admissionregistration.k8s.io
       kind: ValidatingWebhookConfiguration
       name: istio-validator-istio-system
