@@ -1,27 +1,26 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: gateway
+  name: 00-root
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "12"
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - argocd.argoproj.io/resources-finalizer
 spec:
   project: default
   source:
     repoURL: https://github.com/simonangel-fong/argocd-argorollout-istio
     targetRevision: master
-    path: app/gateway
-    helm:
-      releaseName: gateway
+    path: argocd
+    directory:
+      recurse: true
+      exclude: '01-root.yaml'
   destination:
     server: https://kubernetes.default.svc
-    namespace: istio-ingress
+    namespace: argocd
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true

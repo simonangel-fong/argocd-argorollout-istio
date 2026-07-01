@@ -1,12 +1,12 @@
 apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
-  name: deploy
+  name: demo-vs
 spec:
   hosts:
     - {{ .Values.host | quote }}
   gateways:
-    - deploy
+    - demo-gateway
   http:
     - match:
         - uri:

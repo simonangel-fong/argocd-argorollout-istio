@@ -1,33 +1,27 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: istiod
+  name: platform-01-istio-base
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "0"
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - argocd.argoproj.io/resources-finalizer
 spec:
   project: default
   source:
     repoURL: https://istio-release.storage.googleapis.com/charts
-    chart: istiod
+    chart: base
     targetRevision: 1.30.2
     helm:
-      releaseName: istiod
+      releaseName: istio-base
   destination:
     server: https://kubernetes.default.svc
     namespace: istio-system
   ignoreDifferences:
     - group: admissionregistration.k8s.io
-      kind: MutatingWebhookConfiguration
-      name: istio-sidecar-injector
-      jqPathExpressions:
-        - .webhooks[].clientConfig.caBundle
-        - .webhooks[].failurePolicy
-    - group: admissionregistration.k8s.io
       kind: ValidatingWebhookConfiguration
-      name: istio-validator-istio-system
+      name: istiod-default-validator
       jqPathExpressions:
         - .webhooks[].clientConfig.caBundle
         - .webhooks[].failurePolicy

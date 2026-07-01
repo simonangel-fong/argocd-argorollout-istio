@@ -8,7 +8,7 @@ terraform -chdir=infra output
 terraform -chdir=infra destroy --auto-approve
 
 
-az aks get-credentials --resource-group rg_general --name argo-istio-dev --overwrite-existing
+az aks get-credentials --resource-group rg-general --name k8s-deploy-dev --overwrite-existing
 
 export KUBECONFIG=~/kubeconfig
 kubectl get node

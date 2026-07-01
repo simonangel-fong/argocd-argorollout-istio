@@ -1,26 +1,26 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cert-manager
+  name: platform-05-argo-rollouts
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "2"
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - argocd.argoproj.io/resources-finalizer
 spec:
   project: default
   source:
-    repoURL: https://charts.jetstack.io
-    chart: cert-manager
-    targetRevision: v1.16.2
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argo-rollouts
+    targetRevision: 2.41.0
     helm:
-      releaseName: cert-manager
+      releaseName: argo-rollouts
       values: |
-        crds:
+        dashboard:
           enabled: true
   destination:
     server: https://kubernetes.default.svc
-    namespace: cert-manager
+    namespace: argo-rollouts
   syncPolicy:
     automated:
       prune: true
