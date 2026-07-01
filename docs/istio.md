@@ -134,6 +134,18 @@ kubectl -n istio-ingress delete secret deploy-tls
 ```
 
 
+---
+
+## Runbook
+
+```sh
+kubectl -n istio-ingress get certificaterequest,order,challenge
+
+kubectl -n istio-ingress describe challenge
+```
 
 
+- No Challenge object exists, Order is stuck → issuer/DNS/ACME registration problem.
+- Challenge exists, state = pending, reason mentions "self check failed" or HTTP 404 → the http01.ingress.class: istio solver created an Ingress but Istio isn't routing it. This is the most likely case given your setup.
+- Challenge shows "no such host" / DNS error → deploy.arguswatcher.net doesn't resolve to your ingress IP yet.
 
