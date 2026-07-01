@@ -5,10 +5,6 @@ gateway:
     istio: gateway
   namespace: istio-ingress
 
-backend:
-  host: backend.backend.svc.cluster.local
-  port: 80
-
 frontend:
   host: frontend.frontend.svc.cluster.local
   port: 80
