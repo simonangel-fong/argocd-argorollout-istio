@@ -1,16 +1,18 @@
 host: deploy.arguswatcher.net
 
 gateway:
-  selector:
-    istio: ingressgateway
   namespace: istio-ingress
+  # Existing istio-ingressgateway Service that the Gateway API Gateway binds to
+  serviceName: istio-gateway
 
 backend:
-  host: backend.backend.svc.cluster.local
+  name: backend
+  namespace: backend
   port: 80
 
 frontend:
-  host: frontend.frontend.svc.cluster.local
+  name: frontend
+  namespace: frontend
   port: 80
 
 tls:

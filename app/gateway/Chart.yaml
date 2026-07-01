@@ -1,6 +1,6 @@
 apiVersion: v2
 name: gateway
-description: Istio Gateway + VirtualService routing deploy.arguswatcher.net to frontend/backend
+description: Gateway API Gateway + HTTPRoute routing deploy.arguswatcher.net to frontend/backend (Istio-managed)
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
