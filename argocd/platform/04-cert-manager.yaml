@@ -18,20 +18,14 @@ spec:
       values: |
         crds:
           enabled: true
+        webhook:
+          validatingWebhookConfigurationAnnotations:
+            admissions.enforcer/disabled: "true"
+          mutatingWebhookConfigurationAnnotations:
+            admissions.enforcer/disabled: "true"
   destination:
     server: https://kubernetes.default.svc
     namespace: cert-manager
-  ignoreDifferences:
-    - group: admissionregistration.k8s.io
-      kind: ValidatingWebhookConfiguration
-      name: cert-manager-webhook
-      jqPathExpressions:
-        - '.webhooks[].namespaceSelector.matchExpressions[] | select(.key == "control-plane" or .key == "kubernetes.azure.com/managedby")'
-    - group: admissionregistration.k8s.io
-      kind: MutatingWebhookConfiguration
-      name: cert-manager-webhook
-      jqPathExpressions:
-        - '.webhooks[].namespaceSelector.matchExpressions[] | select(.key == "control-plane" or .key == "kubernetes.azure.com/managedby")'
   syncPolicy:
     automated:
       prune: true
