@@ -13,7 +13,7 @@ spec:
   subsets:
     - name: stable
       labels:
-        rollouts-pod-template-hash: stable-placeholder
+        app.kubernetes.io/instance=backend
     - name: canary
       labels:
-        rollouts-pod-template-hash: canary-placeholder
+        app.kubernetes.io/instance=backend
