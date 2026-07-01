@@ -1,4 +1,3 @@
-
 ```sh
 terraform -chdir=infra init --backend-config=backend.hcl --upgrade
 terraform -chdir=infra fmt && terraform -chdir=infra validate

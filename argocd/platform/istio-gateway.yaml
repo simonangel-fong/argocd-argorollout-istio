@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: 04-argo-rollouts
+  name: istio-gateway
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "2"
@@ -10,17 +10,17 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://argoproj.github.io/argo-helm
-    chart: argo-rollouts
-    targetRevision: 2.41.0
+    repoURL: https://istio-release.storage.googleapis.com/charts
+    chart: gateway
+    targetRevision: 1.30.2
     helm:
-      releaseName: argo-rollouts
+      releaseName: istio-gateway
       values: |
-        dashboard:
-          enabled: true
+        service:
+          type: LoadBalancer
   destination:
     server: https://kubernetes.default.svc
-    namespace: argo-rollouts
+    namespace: istio-ingress
   syncPolicy:
     automated:
       prune: true
