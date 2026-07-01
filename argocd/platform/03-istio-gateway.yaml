@@ -18,8 +18,6 @@ spec:
       values: |
         service:
           type: LoadBalancer
-        labels:
-          gateway.networking.k8s.io/gateway-name: demo-gateway
   destination:
     server: https://kubernetes.default.svc
     namespace: istio-ingress
