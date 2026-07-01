@@ -20,6 +20,8 @@ spec:
         crds:
           enabled: true
         config:
+          enableGatewayAPI: true
+        config:
           apiVersion: controller.config.cert-manager.io/v1alpha1
           kind: ControllerConfiguration
           featureGates:
