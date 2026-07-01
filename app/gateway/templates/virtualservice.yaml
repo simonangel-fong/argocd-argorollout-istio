@@ -8,14 +8,6 @@ spec:
   gateways:
     - demo-gateway
   http:
-    - match:
-        - uri:
-            prefix: /api/
-      route:
-        - destination:
-            host: {{ .Values.backend.host | quote }}
-            port:
-              number: {{ .Values.backend.port }}
     - route:
         - destination:
             host: {{ .Values.frontend.host | quote }}

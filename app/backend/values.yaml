@@ -9,9 +9,23 @@ service:
   type: ClusterIP
   port: 80
 
+host: deploy.arguswatcher.net
+gateway:
+  namespace: istio-ingress
+  name: demo-gateway
+
 api:
   appName: demo app
   version: V1.0.0
 
 security:
   enabled: true
+
+canary:
+  steps:
+    - setWeight: 20
+    - pause: {}
+    - setWeight: 50
+    - pause: {}
+    - setWeight: 80
+    - pause: {}

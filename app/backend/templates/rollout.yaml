@@ -1,5 +1,5 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: {{ include "backend.fullname" . }}
   labels:
@@ -40,3 +40,15 @@ spec:
         - name: nginx-conf
           configMap:
             name: {{ include "backend.fullname" . }}
+  strategy:
+    canary:
+      canaryService: {{ include "backend.fullname" . }}-canary
+      stableService: {{ include "backend.fullname" . }}-stable
+      trafficRouting:
+        istio:
+          virtualServices:
+            - name: {{ include "backend.fullname" . }}
+              routes:
+                - primary
+      steps:
+        {{- toYaml .Values.canary.steps | nindent 8 }}

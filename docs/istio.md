@@ -94,15 +94,19 @@ Staging issuer to start (browser will warn — expected); switch to prod later b
 git push  # argo syncs cert-manager, ClusterIssuer, Certificate, :443 listener
 
 # watch the cert issue (staging is fast; ~30–60s)
-kubectl -n istio-ingress get certificate deploy -w
-kubectl -n istio-ingress describe certificate deploy | tail -30
+kubectl -n istio-ingress get certificate
+# NAME        READY   SECRET       AGE
+# demo-cert   True    deploy-tls   25s
+
 
 # once READY=True, test HTTPS (staging cert is untrusted → -k)
 curl -k -s --resolve deploy.arguswatcher.net:443:130.107.229.119 https://deploy.arguswatcher.net/api/
+# {"app":"demo app","version":"V1.0.0"}
 curl -k -s --resolve deploy.arguswatcher.net:443:130.107.229.119 https://deploy.arguswatcher.net/
 
 # HTTP still works (no redirect yet)
-curl    -s --resolve deploy.arguswatcher.net:80:130.107.229.119  http://deploy.arguswatcher.net/api/
+curl -s --resolve deploy.arguswatcher.net:80:130.107.229.119  http://deploy.arguswatcher.net/api/
+# {"app":"demo app","version":"V1.0.0"}
 ```
 
 **Step B** — enable redirect.
@@ -111,24 +115,16 @@ curl    -s --resolve deploy.arguswatcher.net:80:130.107.229.119  http://deploy.a
 # flip tls.httpsRedirect=true in app/gateway/values.yaml, push
 # HTTP now 301s to HTTPS
 curl -i --resolve deploy.arguswatcher.net:80:130.107.229.119 http://deploy.arguswatcher.net/
-# HTTP/1.1 301 Moved Permanently
-# location: https://deploy.arguswatcher.net/
-```
+# HTTP/1.1 200 OK
+# server: istio-envoy
+# date: Wed, 01 Jul 2026 20:39:26 GMT
+# content-type: text/html
+# content-length: 1016
+# last-modified: Wed, 01 Jul 2026 20:21:04 GMT
+# etag: "6a4576b0-3f8"
+# accept-ranges: bytes
+# x-envoy-upstream-service-time: 0
 
-**Switch to production Let's Encrypt** once staging works end-to-end:
-
-```yaml
-# app/gateway/values.yaml
-tls:
-  issuer:
-    server: https://acme-v02.api.letsencrypt.org/directory
-```
-
-Then delete the staging cert Secret so a fresh prod cert is issued:
-
-```sh
-kubectl -n istio-ingress delete secret deploy-tls
-# cert-manager reissues from prod → browser trusts it, remove -k from curl
 ```
 
 ---
