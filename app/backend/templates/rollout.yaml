@@ -43,14 +43,14 @@ spec:
           configMap:
             name: {{ include "backend.fullname" . }}
   strategy:
-    canary:
-      canaryService: {{ include "backend.fullname" . }}-canary
-      stableService: {{ include "backend.fullname" . }}-stable
-      trafficRouting:
-        istio:
-          virtualServices:
-            - name: {{ include "backend.fullname" . }}
-              routes:
-                - primary
-      steps:
-        {{- toYaml .Values.canary.steps | nindent 8 }}
+    blueGreen:
+      # Service selectors are patched by Rollouts at runtime with
+      # rollouts-pod-template-hash to bind active -> old ReplicaSet
+      # and preview -> new ReplicaSet.
+      activeService: {{ include "backend.fullname" . }}-active
+      previewService: {{ include "backend.fullname" . }}-preview
+      # Manual promotion — Rollout pauses after preview is ready; promote via:
+      #   kubectl argo rollouts promote {{ include "backend.fullname" . }} -n {{ .Release.Namespace }}
+      autoPromotionEnabled: false
+      # Keep the old ReplicaSet running this long after the flip so aborts are near-instant.
+      scaleDownDelaySeconds: {{ .Values.blueGreen.scaleDownDelaySeconds }}

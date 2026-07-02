@@ -1,15 +1,14 @@
-# Two Services required by the Argo Rollouts + Istio canary pattern.
+# Two Services required by the Argo Rollouts blue-green pattern.
 # Selectors here match ALL backend pods; Rollouts patches each Service's
 # selector at runtime with `rollouts-pod-template-hash: <hash>` to bind
-# stable -> old ReplicaSet, canary -> new ReplicaSet. The VirtualService
-# then weights traffic between the two.
+# active -> current live ReplicaSet, preview -> new ReplicaSet.
 ---
-# Stable Service — receives traffic destined for the current (old) version.
-# Referenced by Rollout.spec.strategy.canary.stableService.
+# Active Service — receives production traffic. Flipped to the new ReplicaSet
+# at the moment of promotion. Referenced by Rollout.spec.strategy.blueGreen.activeService.
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "backend.fullname" . }}-stable
+  name: {{ include "backend.fullname" . }}-active
   labels:
     {{- include "backend.labels" . | nindent 4 }}
 spec:
@@ -22,12 +21,13 @@ spec:
   selector:
     {{- include "backend.selectorLabels" . | nindent 4 }}
 ---
-# Canary Service — receives traffic destined for the new version during a rollout.
-# Referenced by Rollout.spec.strategy.canary.canaryService.
+# Preview Service — points at the new ReplicaSet immediately after it becomes
+# available, so testers can hit the new version before flipping production
+# traffic. Referenced by Rollout.spec.strategy.blueGreen.previewService.
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "backend.fullname" . }}-canary
+  name: {{ include "backend.fullname" . }}-preview
   labels:
     {{- include "backend.labels" . | nindent 4 }}
 spec:

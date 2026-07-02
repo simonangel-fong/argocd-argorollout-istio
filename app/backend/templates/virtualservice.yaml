@@ -1,3 +1,8 @@
+# Blue-green routing:
+#   Request with header `x-preview: true`  -> preview Service (new version)
+#   Any other request                      -> active Service (live version)
+# Argo Rollouts does NOT patch this VirtualService — the switch happens at
+# the Service selector level, not by weight change.
 apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
@@ -10,18 +15,26 @@ spec:
   gateways:
     - {{ .Values.gateway.namespace }}/{{ .Values.gateway.name }}
   http:
-    - name: primary
+    # Preview lane — hit with `curl -H 'x-preview: true'` to reach the new version.
+    - name: preview
+      match:
+        - uri:
+            prefix: /api/
+          headers:
+            {{ .Values.blueGreen.previewHeader | quote }}:
+              exact: "true"
+      route:
+        - destination:
+            host: {{ include "backend.fullname" . }}-preview
+            port:
+              number: {{ .Values.service.port }}
+    # Production lane — everything else.
+    - name: active
       match:
         - uri:
             prefix: /api/
       route:
         - destination:
-            host: {{ include "backend.fullname" . }}-stable
+            host: {{ include "backend.fullname" . }}-active
             port:
               number: {{ .Values.service.port }}
-          weight: 100
-        - destination:
-            host: {{ include "backend.fullname" . }}-canary
-            port:
-              number: {{ .Values.service.port }}
-          weight: 0
